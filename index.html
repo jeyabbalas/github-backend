@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Document Manager</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login View -->
+    <div id="login-view" class="view">
+      <div class="login-container">
+        <h1>GitHub Document Manager</h1>
+        <p class="subtitle">Store and manage your Markdown documents using GitHub as your backend.</p>
+        <button id="login-btn" class="btn btn-primary btn-large">
+          <svg class="icon" viewBox="0 0 16 16" width="20" height="20">
+            <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          Login with GitHub
+        </button>
+        <p class="info-text">
+          Your documents are stored in your own GitHub repositories.
+          <br>No data is stored on any external server.
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Dashboard View -->
+    <div id="dashboard-view" class="view hidden">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <h1 class="header-title">GitHub Document Manager</h1>
+        </div>
+        <div class="header-right">
+          <span id="user-info" class="user-info"></span>
+          <button id="logout-btn" class="btn btn-secondary">Logout</button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Sidebar: Repository and Folder Navigation -->
+        <aside class="sidebar">
+          <!-- Repository Selector -->
+          <div class="sidebar-section">
+            <label for="repo-select" class="label">Repository</label>
+            <div class="select-wrapper">
+              <select id="repo-select" class="select">
+                <option value="">Select a repository...</option>
+              </select>
+            </div>
+            <button id="create-repo-btn" class="btn btn-secondary btn-small btn-block">
+              + Create Repository
+            </button>
+          </div>
+
+          <!-- Folder Navigation -->
+          <div class="sidebar-section">
+            <label class="label">Location</label>
+            <nav id="breadcrumb" class="breadcrumb">
+              <span class="breadcrumb-item">Select a repository</span>
+            </nav>
+            <button id="create-folder-btn" class="btn btn-secondary btn-small btn-block" disabled>
+              + New Folder
+            </button>
+          </div>
+
+          <!-- File List -->
+          <div class="sidebar-section file-list-section">
+            <div class="file-list-header">
+              <label class="label">Files</label>
+              <button id="create-file-btn" class="btn btn-primary btn-small" disabled>
+                + New Document
+              </button>
+            </div>
+            <ul id="file-list" class="file-list">
+              <li class="file-list-empty">Select a repository to view files</li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Editor Panel -->
+        <section class="editor-panel">
+          <div id="editor-placeholder" class="editor-placeholder">
+            <p>Select a document to edit or create a new one</p>
+          </div>
+
+          <div id="editor-container" class="editor-container hidden">
+            <!-- Editor Header -->
+            <div class="editor-header">
+              <div class="editor-title">
+                <span id="editor-filename" class="editor-filename"></span>
+                <span id="editor-status" class="editor-status"></span>
+              </div>
+              <div class="editor-actions">
+                <div class="version-dropdown">
+                  <button id="version-btn" class="btn btn-secondary btn-small">
+                    History
+                  </button>
+                  <div id="version-menu" class="dropdown-menu hidden">
+                    <div class="dropdown-header">Version History</div>
+                    <ul id="version-list" class="version-list">
+                      <!-- Versions will be populated here -->
+                    </ul>
+                  </div>
+                </div>
+                <button id="save-btn" class="btn btn-primary btn-small" disabled>
+                  Save
+                </button>
+                <button id="delete-btn" class="btn btn-danger btn-small">
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            <!-- Editor Content -->
+            <textarea id="editor" class="editor" placeholder="Start writing your Markdown document..."></textarea>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <p id="loading-message" class="loading-message">Loading...</p>
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div id="modal" class="modal">
+        <div class="modal-header">
+          <h2 id="modal-title" class="modal-title"></h2>
+          <button id="modal-close" class="modal-close">&times;</button>
+        </div>
+        <div id="modal-content" class="modal-content">
+          <!-- Modal content will be injected here -->
+        </div>
+        <div id="modal-footer" class="modal-footer">
+          <!-- Modal buttons will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- Octokit Library -->
+  <script src="https://cdn.jsdelivr.net/npm/octokit@3.1.0/dist-web/octokit.min.js"></script>
+
+  <!-- Application Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/github-api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
