@@ -5,7 +5,11 @@
  * Handles application state and coordinates user actions.
  */
 
-const App = (function () {
+import { Auth } from './auth.js';
+import { GitHubAPI } from './github-api.js';
+import { UI } from './ui.js';
+
+export const App = (function () {
   // Application state
   const state = {
     user: null,
@@ -538,8 +542,3 @@ const App = (function () {
     init,
   };
 })();
-
-// Start the application when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  App.init();
-});

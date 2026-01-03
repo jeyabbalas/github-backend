@@ -5,7 +5,7 @@
  * Provides a clean interface for the main app to update the UI.
  */
 
-const UI = (function () {
+export const UI = (function () {
   // DOM element references (cached for performance)
   const elements = {
     // Views

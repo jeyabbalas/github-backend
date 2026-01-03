@@ -14,7 +14,9 @@
  * 6. Store token in sessionStorage
  */
 
-const Auth = (function () {
+import { CONFIG } from './config.js';
+
+export const Auth = (function () {
   // Private: Octokit instance (created after authentication)
   let octokitInstance = null;
 

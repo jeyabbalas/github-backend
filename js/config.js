@@ -13,7 +13,7 @@
  *    (e.g., https://your-username.github.io/github-backend/)
  */
 
-const CONFIG = {
+export const CONFIG = {
   // GitHub OAuth App Client ID
   // Get this from: https://github.com/settings/developers
   CLIENT_ID: 'Ov23liDU8NltDFxZJN6N',

@@ -5,7 +5,9 @@
  * All methods use the authenticated Octokit instance from the Auth module.
  */
 
-const GitHubAPI = (function () {
+import { Auth } from './auth.js';
+
+export const GitHubAPI = (function () {
   /**
    * Get the authenticated user's information
    * @returns {Promise<Object>} User object with login, name, avatar_url, etc.
