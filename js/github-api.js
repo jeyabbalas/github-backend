@@ -14,7 +14,7 @@ const GitHubAPI = (function () {
     const octokit = Auth.getOctokit();
     if (!octokit) throw new Error('Not authenticated');
 
-    const { data } = await octokit.rest.users.getAuthenticated();
+    const { data } = await octokit.users.getAuthenticated();
     return data;
   }
 
@@ -29,7 +29,7 @@ const GitHubAPI = (function () {
     const octokit = Auth.getOctokit();
     if (!octokit) throw new Error('Not authenticated');
 
-    const { data } = await octokit.rest.repos.listForAuthenticatedUser({
+    const { data } = await octokit.repos.listForAuthenticatedUser({
       sort: options.sort || 'updated',
       per_page: options.per_page || 100,
       affiliation: 'owner', // Only repos owned by the user
@@ -51,7 +51,7 @@ const GitHubAPI = (function () {
     const octokit = Auth.getOctokit();
     if (!octokit) throw new Error('Not authenticated');
 
-    const { data } = await octokit.rest.repos.createForAuthenticatedUser({
+    const { data } = await octokit.repos.createForAuthenticatedUser({
       name: name,
       description: options.description || '',
       private: options.private !== false, // Default to private
@@ -83,7 +83,7 @@ const GitHubAPI = (function () {
       params.ref = ref;
     }
 
-    const { data } = await octokit.rest.repos.getContent(params);
+    const { data } = await octokit.repos.getContent(params);
     return data;
   }
 
@@ -147,7 +147,7 @@ const GitHubAPI = (function () {
       params.sha = sha;
     }
 
-    const { data } = await octokit.rest.repos.createOrUpdateFileContents(params);
+    const { data } = await octokit.repos.createOrUpdateFileContents(params);
     return data;
   }
 
@@ -164,7 +164,7 @@ const GitHubAPI = (function () {
     const octokit = Auth.getOctokit();
     if (!octokit) throw new Error('Not authenticated');
 
-    const { data } = await octokit.rest.repos.deleteFile({
+    const { data } = await octokit.repos.deleteFile({
       owner,
       repo,
       path,
@@ -188,7 +188,7 @@ const GitHubAPI = (function () {
     const octokit = Auth.getOctokit();
     if (!octokit) throw new Error('Not authenticated');
 
-    const { data } = await octokit.rest.repos.listCommits({
+    const { data } = await octokit.repos.listCommits({
       owner,
       repo,
       path,

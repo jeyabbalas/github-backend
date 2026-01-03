@@ -5,14 +5,22 @@
  * GitHub doesn't include CORS headers in their response, which prevents
  * browser-based applications from making direct requests.
  *
- * SECURITY: This worker validates the Origin header to ensure only
- * requests from your GitHub Pages domain are accepted.
+ * SECURITY:
+ * - Validates the Origin header to ensure only requests from your GitHub Pages domain are accepted
+ * - Stores the client_secret securely as an environment variable (not in browser code)
  *
  * DEPLOYMENT:
  * 1. Go to https://dash.cloudflare.com
- * 2. Navigate to Workers & Pages → Create Application → Create Worker
- * 3. Paste this code and deploy
- * 4. Update ALLOWED_ORIGINS below with your GitHub Pages domain
+ * 2. Navigate to Compute & AI → Workers & Pages → Create application → Start with Hello World!
+ * 3. Worker name: `github-oauth-proxy.jeyabbalas.workers.dev`
+ * 4. Click Deploy
+ * 5. Click Edit code → Copy code below → Deploy
+ *    - Update ALLOWED_ORIGINS below with your GitHub Pages domain
+ *    - Add CLIENT_SECRET as an environment variable:
+ *      - Go to Worker Settings → Variables and Secrets → +Add
+ *      - Type: Secret
+ *      - Name: CLIENT_SECRET
+ *      - Value: (your GitHub OAuth App client secret)
  */
 
 // =============================================================================
@@ -27,7 +35,7 @@ const ALLOWED_ORIGINS = [
 ];
 
 // =============================================================================
-// WORKER CODE - NO CHANGES NEEDED BELOW THIS LINE
+// WORKER CODE
 // =============================================================================
 
 const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
@@ -68,6 +76,21 @@ export default {
     }
 
     try {
+      // Get client_secret from environment variable
+      const clientSecret = env.CLIENT_SECRET;
+      if (!clientSecret) {
+        return new Response(JSON.stringify({
+          error: 'Server configuration error',
+          message: 'CLIENT_SECRET environment variable is not configured in the worker.'
+        }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            ...getCORSHeaders(request),
+          },
+        });
+      }
+
       // Parse the request body
       const body = await request.json();
 
@@ -87,14 +110,15 @@ export default {
         });
       }
 
-      // Build the request to GitHub
+      // Build the request to GitHub (including client_secret from env)
       const githubParams = new URLSearchParams({
         client_id,
+        client_secret: clientSecret,
         code,
         redirect_uri: redirect_uri || '',
       });
 
-      // Add code_verifier for PKCE flow
+      // Add code_verifier for PKCE flow (additional security)
       if (code_verifier) {
         githubParams.append('code_verifier', code_verifier);
       }
