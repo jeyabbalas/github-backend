@@ -491,12 +491,12 @@ export const UI = (function () {
         {
           text: 'Create',
           className: 'btn btn-primary',
-          onClick: () => {
+          onClick: async () => {
             const name = document.getElementById('repo-name').value.trim();
             const description = document.getElementById('repo-description').value.trim();
             if (name && callbacks.onCreateRepo) {
-              callbacks.onCreateRepo(name, description);
               hideModal();
+              await callbacks.onCreateRepo(name, description);
             }
           },
         },
@@ -521,11 +521,11 @@ export const UI = (function () {
         {
           text: 'Create',
           className: 'btn btn-primary',
-          onClick: () => {
+          onClick: async () => {
             const name = document.getElementById('folder-name').value.trim();
             if (name && callbacks.onCreateFolder) {
-              callbacks.onCreateFolder(name);
               hideModal();
+              await callbacks.onCreateFolder(name);
             }
           },
         },
@@ -551,14 +551,14 @@ export const UI = (function () {
         {
           text: 'Create',
           className: 'btn btn-primary',
-          onClick: () => {
+          onClick: async () => {
             let name = document.getElementById('file-name').value.trim();
             if (name) {
               // Add .md extension if not present
               if (!name.endsWith('.md')) name += '.md';
               if (callbacks.onCreateFile) {
-                callbacks.onCreateFile(name);
                 hideModal();
+                await callbacks.onCreateFile(name);
               }
             }
           },
@@ -584,11 +584,11 @@ export const UI = (function () {
         {
           text: 'Save',
           className: 'btn btn-primary',
-          onClick: () => {
+          onClick: async () => {
             const message = document.getElementById('commit-message').value.trim() || 'Update document';
             if (callbacks.onSaveFile) {
-              callbacks.onSaveFile(message);
               hideModal();
+              await callbacks.onSaveFile(message);
             }
           },
         },
