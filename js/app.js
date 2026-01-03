@@ -23,6 +23,18 @@ export const App = (function () {
   };
 
   /**
+   * Handler for beforeunload event - warns user about unsaved changes
+   */
+  function handleBeforeUnload(e) {
+    if (state.isModified) {
+      // Standard way to trigger the browser's "unsaved changes" dialog
+      e.preventDefault();
+      e.returnValue = ''; // Required for Chrome
+      return ''; // Required for some browsers
+    }
+  }
+
+  /**
    * Initialize the application
    */
   async function init() {
@@ -42,6 +54,9 @@ export const App = (function () {
       onConfirmDelete: handleConfirmDelete,
       onVersionSelect: handleVersionSelect,
     });
+
+    // Add warning when leaving page with unsaved changes
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     // Check for OAuth callback
     try {
@@ -105,6 +120,8 @@ export const App = (function () {
    * Handle logout button click
    */
   function handleLogout() {
+    // Remove beforeunload listener since we're logging out
+    window.removeEventListener('beforeunload', handleBeforeUnload);
     Auth.logout();
     resetState();
     UI.showLoginView();
@@ -143,11 +160,11 @@ export const App = (function () {
    * @param {string} name - Repository name
    * @param {string} description - Repository description
    */
-  async function handleCreateRepo(name, description) {
+  async function handleCreateRepo(name, description, isPrivate = false) {
     try {
       UI.showLoading('Creating repository...');
 
-      const repo = await GitHubAPI.createRepository(name, { description });
+      const repo = await GitHubAPI.createRepository(name, { description, private: isPrivate });
 
       // Refresh repositories list
       state.repositories = await GitHubAPI.listRepositories();

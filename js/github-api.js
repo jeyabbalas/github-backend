@@ -56,7 +56,7 @@ export const GitHubAPI = (function () {
     const { data } = await octokit.repos.createForAuthenticatedUser({
       name: name,
       description: options.description || '',
-      private: options.private !== false, // Default to private
+      private: options.private === true, // Default to public
       auto_init: options.auto_init !== false, // Default to auto-init
     });
 

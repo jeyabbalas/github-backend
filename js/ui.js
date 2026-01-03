@@ -5,6 +5,8 @@
  * Provides a clean interface for the main app to update the UI.
  */
 
+import { CONFIG } from './config.js';
+
 export const UI = (function () {
   // DOM element references (cached for performance)
   const elements = {
@@ -474,6 +476,9 @@ export const UI = (function () {
    * Show create repository modal
    */
   function showCreateRepoModal() {
+    // Check if we can create private repos (requires 'repo' scope, not 'public_repo')
+    const canCreatePrivate = CONFIG.OAUTH_SCOPE === 'repo';
+
     showModal(
       'Create Repository',
       `
@@ -485,6 +490,13 @@ export const UI = (function () {
           <label for="repo-description">Description (optional)</label>
           <input type="text" id="repo-description" class="input" placeholder="My document storage">
         </div>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: ${canCreatePrivate ? 'pointer' : 'not-allowed'};">
+            <input type="checkbox" id="repo-private" ${canCreatePrivate ? '' : 'disabled'}>
+            <span style="${canCreatePrivate ? '' : 'color: #6a737d;'}">Make this repository private</span>
+          </label>
+          ${canCreatePrivate ? '' : '<small style="color: #6a737d;">Private repos require the "repo" OAuth scope</small>'}
+        </div>
       `,
       [
         { text: 'Cancel', className: 'btn btn-secondary', onClick: hideModal },
@@ -494,9 +506,10 @@ export const UI = (function () {
           onClick: async () => {
             const name = document.getElementById('repo-name').value.trim();
             const description = document.getElementById('repo-description').value.trim();
+            const isPrivate = document.getElementById('repo-private').checked;
             if (name && callbacks.onCreateRepo) {
               hideModal();
-              await callbacks.onCreateRepo(name, description);
+              await callbacks.onCreateRepo(name, description, isPrivate);
             }
           },
         },
