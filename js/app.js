@@ -53,6 +53,7 @@ export const App = (function () {
       onSaveFile: handleSaveFile,
       onConfirmDelete: handleConfirmDelete,
       onVersionSelect: handleVersionSelect,
+      onRefresh: handleRefresh,
     });
 
     // Add warning when leaving page with unsaved changes
@@ -166,8 +167,12 @@ export const App = (function () {
 
       const repo = await GitHubAPI.createRepository(name, { description, private: isPrivate });
 
-      // Refresh repositories list
-      state.repositories = await GitHubAPI.listRepositories();
+      // Optimistically add the new repo to state if not already there
+      // (GitHub API may have latency before it appears in listRepositories)
+      const existingIndex = state.repositories.findIndex((r) => r.full_name === repo.full_name);
+      if (existingIndex === -1) {
+        state.repositories.unshift(repo); // Add to beginning (most recent)
+      }
       UI.renderRepositories(state.repositories);
 
       // Select the new repository
@@ -216,8 +221,16 @@ export const App = (function () {
 
       await GitHubAPI.createFolder(state.currentRepo.owner, state.currentRepo.name, folderPath);
 
-      // Reload contents
-      await loadContents();
+      // Optimistically add the folder to state.contents
+      // (GitHub API may have latency before it appears in getContents)
+      const newFolder = {
+        name: name,
+        path: folderPath,
+        type: 'dir',
+        sha: null, // SHA not needed for display
+      };
+      state.contents.push(newFolder);
+      UI.renderFileList(state.contents, state.currentFile?.path);
 
       UI.hideLoading();
       UI.showToast(`Folder "${name}" created!`, 'success');
@@ -240,7 +253,7 @@ export const App = (function () {
 
       const filePath = state.currentPath ? `${state.currentPath}/${name}` : name;
 
-      await GitHubAPI.createOrUpdateFile(
+      const result = await GitHubAPI.createOrUpdateFile(
         state.currentRepo.owner,
         state.currentRepo.name,
         filePath,
@@ -248,8 +261,18 @@ export const App = (function () {
         `Create ${name}`
       );
 
-      // Reload contents and open the new file
-      await loadContents();
+      // Optimistically add the file to state.contents
+      // (GitHub API may have latency before it appears in getContents)
+      const newFile = {
+        name: name,
+        path: filePath,
+        type: 'file',
+        sha: result.content.sha,
+      };
+      state.contents.push(newFile);
+      UI.renderFileList(state.contents, filePath);
+
+      // Open the new file in editor
       await handleFileSelect(filePath);
 
       UI.hideLoading();
@@ -351,6 +374,10 @@ export const App = (function () {
         sha
       );
 
+      // Optimistically remove the file from state.contents
+      // (GitHub API may have latency before it disappears from getContents)
+      state.contents = state.contents.filter((item) => item.path !== path);
+
       // If we deleted the currently open file, close the editor
       if (state.currentFile && state.currentFile.path === path) {
         state.currentFile = null;
@@ -358,8 +385,7 @@ export const App = (function () {
         UI.hideEditor();
       }
 
-      // Reload contents
-      await loadContents();
+      UI.renderFileList(state.contents, state.currentFile?.path);
 
       UI.hideLoading();
       UI.showToast('Document deleted', 'success');
@@ -478,6 +504,24 @@ export const App = (function () {
       console.error('Failed to load version:', error);
       UI.hideLoading();
       UI.showToast(error.message || 'Failed to load version', 'error');
+    }
+  }
+
+  /**
+   * Handle refresh button click
+   */
+  async function handleRefresh() {
+    if (!state.currentRepo) return;
+
+    try {
+      UI.showLoading('Refreshing...');
+      await loadContents();
+      UI.hideLoading();
+      UI.showToast('Refreshed', 'success');
+    } catch (error) {
+      console.error('Failed to refresh:', error);
+      UI.hideLoading();
+      UI.showToast('Failed to refresh', 'error');
     }
   }
 

@@ -32,6 +32,7 @@ export const UI = (function () {
     // File list
     fileList: document.getElementById('file-list'),
     createFileBtn: document.getElementById('create-file-btn'),
+    refreshBtn: document.getElementById('refresh-btn'),
 
     // Editor
     editorPlaceholder: document.getElementById('editor-placeholder'),
@@ -103,6 +104,11 @@ export const UI = (function () {
     // Create file
     elements.createFileBtn.addEventListener('click', () => {
       showCreateFileModal();
+    });
+
+    // Refresh file list
+    elements.refreshBtn.addEventListener('click', () => {
+      if (callbacks.onRefresh) callbacks.onRefresh();
     });
 
     // Save file
@@ -200,6 +206,7 @@ export const UI = (function () {
     elements.repoSelect.value = fullName;
     elements.createFolderBtn.disabled = false;
     elements.createFileBtn.disabled = false;
+    elements.refreshBtn.disabled = false;
   }
 
   // ===== Breadcrumb Navigation =====

@@ -71,9 +71,14 @@
           <div class="sidebar-section file-list-section">
             <div class="file-list-header">
               <label class="label">Files</label>
-              <button id="create-file-btn" class="btn btn-primary btn-small" disabled>
-                + New Document
-              </button>
+              <div class="file-list-actions">
+                <button id="refresh-btn" class="btn btn-secondary btn-small" title="Refresh" disabled>
+                  ↻
+                </button>
+                <button id="create-file-btn" class="btn btn-primary btn-small" disabled>
+                  + New Document
+                </button>
+              </div>
             </div>
             <ul id="file-list" class="file-list">
               <li class="file-list-empty">Select a repository to view files</li>

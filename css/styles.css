@@ -370,6 +370,11 @@ body {
   margin-bottom: var(--spacing-sm);
 }
 
+.file-list-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
 .file-list {
   flex: 1;
   list-style: none;
