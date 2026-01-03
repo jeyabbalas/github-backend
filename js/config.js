@@ -28,7 +28,7 @@ export const CONFIG = {
 
   // OAuth scope - 'repo' gives access to private and public repositories
   // Use 'public_repo' if you only want access to public repositories
-  OAUTH_SCOPE: 'repo',
+  OAUTH_SCOPE: 'public_repo',
 
   // Session storage keys
   STORAGE_KEYS: {
